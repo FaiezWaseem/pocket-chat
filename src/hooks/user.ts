@@ -8,7 +8,7 @@ type Store = {
 
 const useUser = create<Store>()((set) => ({
   user: null,
-  setUser: (user : User | null) => set((state) => ({ user })),
+  setUser: (user : User | null) => set(() => ({ user })),
 }))
 
 

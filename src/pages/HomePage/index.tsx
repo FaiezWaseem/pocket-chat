@@ -23,7 +23,7 @@ type Message = {
     recieverId: string
     text: string
     time: string
-    file?: string,
+    file?: string | any ,
     filetype : 'image' | 'video'
 }
 
@@ -108,7 +108,7 @@ export default function WhatsAppClone() {
         }
         if (file) {
             const fileType = file.type.startsWith('image/') ? 'image' : 'video'
-            newMsg.file = URL.createObjectURL(file)
+            newMsg.file = file
             newMsg.filetype = fileType
         }
 

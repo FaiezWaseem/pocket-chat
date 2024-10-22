@@ -13,8 +13,36 @@ import { User } from '@/types/User'
 import useUser from '@/hooks/user'
 import pb from '@/lib/pb'
 import { POCKET_ENDPOINT } from '@/contants'
+import { cn } from '@/lib/utils'
 
-
+export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
+    size?: number;
+    className?: string;
+  }
+  
+  export const LoadingSpinner = ({
+    size = 24,
+    className,
+    ...props
+  }: ISVGProps) => {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        {...props}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={cn("animate-spin", className)}
+      >
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+    );
+  };
 
 type Message = {
     id ?: string
@@ -42,6 +70,8 @@ export default function WhatsAppClone() {
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const sidebarRef = useRef<HTMLDivElement>(null)
+
+    const [isSending, setIsSending] = useState(false)
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -98,6 +128,8 @@ export default function WhatsAppClone() {
 
     const handleSendMessage = async () => {
         if (newMessage.trim() === '' && !file) return
+
+        setIsSending(true)
         const newMsg: Message = {
             senderId: user?.id ?? '', // Assuming 0 is the current user
             recieverId: selectedContact?.id ?? '',
@@ -113,7 +145,7 @@ export default function WhatsAppClone() {
         }
 
         await pb.collection('chats').create(newMsg)
-
+        setIsSending(false)
         // setMessages([...messages, newMsg])
         setNewMessage('')
         setFile(null)
@@ -321,8 +353,8 @@ export default function WhatsAppClone() {
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     className="flex-1"
                                 />
-                                <Button type="submit">
-                                    <Send className="h-5 w-5" />
+                                <Button type="submit" disabled={isSending}>
+                                    { isSending ? <LoadingSpinner /> :  <Send className="h-5 w-5" />}
                                     <span className="sr-only">Send message</span>
                                 </Button>
                             </form>
